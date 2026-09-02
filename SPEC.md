@@ -115,7 +115,8 @@ Unsubscribe link per trip.
 ## 6. Out of scope for v1
 
 Live GPS tracking, mobile app, SMS/push, per-person expense splitting, route
-mapping/turn-by-turn, offline mode, photo uploads, public shareable pages.
+mapping/turn-by-turn, offline mode, photo uploads, public shareable pages,
+anonymous/preview access for invited cheerleaders.
 
 ## 7. Design principles
 
