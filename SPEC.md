@@ -22,7 +22,8 @@ Roles are per-trip membership rows, not global user attributes.
 
 | Capability | Owner | Contributor | Cheerleader | Viewer |
 |---|---|---|---|---|
-| View trip | yes | yes | yes | yes |
+| View trip (route, progress, energy, rider comments) | yes | yes | yes | yes |
+| View supplies, lodging, costs & budget | yes | yes | **no** | **no** |
 | Edit trip details | yes | no | no | no |
 | Add/edit destinations, supplies, lodging, costs | yes | yes | no | no |
 | Log own check-in + energy | yes | yes | no | no |
@@ -30,13 +31,17 @@ Roles are per-trip membership rows, not global user attributes.
 | Delete trip | yes | no | no | no |
 | Receive update notifications | opt-in | opt-in | yes (default) | no |
 
+Every member, cheerleaders included, must have an account and an `active`
+membership row before any trip data is returned.
+
 Owner is a single account; ownership transfer is out of scope for v1.
 
 ## 4. Domain model
 
 - **profile** — id (= auth user), display_name, avatar_url, created_at.
 - **trip** — id, owner_id, name, description, start_date, end_date, status
-  (planning | active | completed), currency, created_at.
+  (planning | active | completed), currency, distance_unit (km | mi, display
+  default), created_at.
 - **trip_member** — id, trip_id, user_id (nullable until invite accepted),
   invite_email, role (owner | contributor | cheerleader | viewer), status
   (invited | active | removed).
