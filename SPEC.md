@@ -121,11 +121,24 @@ mapping/turn-by-turn, offline mode, photo uploads, public shareable pages.
 6. Members, invites, roles
 7. Activity feed + email notifications
 
-## 9. Open questions
+## 9. Resolved decisions
 
-- Should cheerleaders see costs and budget, or only route/progress/energy?
-- Does a trip have one shared energy line, or one per rider (spec assumes per
-  rider)?
-- Distance: kilometres, miles, or a per-trip unit preference?
-- Should an invited cheerleader without an account see a limited public link
-  before signing up?
+- **Cheerleader visibility** — cheerleaders never see costs, budget, supplies or
+  lodging. They see the route (destinations + order), progress, energy data and
+  rider comments (`mood_note` on check-ins) only. Enforced by RLS: the supply,
+  lodging and cost columns are unreadable for members whose role is
+  `cheerleader` or `viewer`, not just hidden in the UI.
+- **Energy is per rider** — every rider gets their own feed on the trip page
+  showing: their average energy across all their check-ins, their energy at each
+  logged point (chart + list), and their comments in chronological order. The
+  trip page also shows a combined chart overlaying one line per rider.
+- **Distance units are a per-trip preference** — `trip.distance_unit`
+  (`km | mi`), set by the owner, is the storage-independent display default.
+  Distances are always stored in kilometres and converted on display. On the
+  trip summary page a viewer can switch units themselves (per-viewer override,
+  remembered locally), which converts: total planned trip distance, distance
+  between/from each destination, and total distance travelled so far.
+- **No anonymous access** — a cheerleader must create an account and accept the
+  invite before seeing any trip data. Invite links land on sign-up/sign-in; no
+  public or preview page exists in v1.
+
