@@ -76,27 +76,41 @@ optional coordinates and notes. Marking a destination reached happens via a
 check-in.
 
 **Supplies** — line items with quantity and unit cost, grouped by category,
-packed checkbox. Auto-computed subtotal.
+packed checkbox. Auto-computed subtotal. Owner/contributor only.
 
 **Lodging** — stays attached to a destination or standalone, with dates, cost
-and booking reference.
+and booking reference. Owner/contributor only.
 
 **Budget** — a single trip cost summary: supplies subtotal + lodging subtotal +
 total, with per-category breakdown. No per-person splitting in v1.
+Owner/contributor only — hidden and unreadable for cheerleaders/viewers.
 
 **Energy check-ins** — at a destination a rider logs arrival time, energy 1–10,
-optional note and distance. Trip page shows an energy line chart over the trip
-timeline, per rider, plus averages.
+optional comment and distance. The trip page shows a combined chart with one
+line per rider over the trip timeline.
 
-**Cheerleaders** — owner invites by email; invitee gets an email link, signs in
-or signs up, and joins the trip as cheerleader. They see a read-only trip page
-and follow the activity feed.
+**Rider feed** — each rider has their own feed on the trip: average energy
+across all their check-ins, their energy at every logged point (chart + list of
+destination, time, energy), and their comments in chronological order.
+Cheerleaders can open any rider's feed.
+
+**Distance & units** — distances stored in kilometres; each trip has a
+`distance_unit` default set by the owner. On the trip summary page any viewer
+can toggle km/mi, converting total planned distance, distance from/between
+destinations, and total distance travelled. The choice is remembered per viewer
+and never changes stored data.
+
+**Cheerleaders** — owner invites by email; the invite link requires the invitee
+to sign up or sign in before any trip data loads. Once accepted they get a
+read-only trip page: route, progress, energy, rider feeds and the activity feed
+— no costs.
 
 **Activity feed + email** — every meaningful action writes an
 `activity_event` (check-in logged, destination reached, trip started/completed,
-member joined). The trip page renders the feed. Cheerleaders receive email:
-instant for check-ins and trip status changes, or a daily digest, per their
-preference. Unsubscribe link per trip.
+member joined). The trip page renders the feed; cost-related events are
+filtered out for cheerleaders/viewers. Cheerleaders receive email: instant for
+check-ins and trip status changes, or a daily digest, per their preference.
+Unsubscribe link per trip.
 
 ## 6. Out of scope for v1
 
