@@ -22,7 +22,8 @@ Roles are per-trip membership rows, not global user attributes.
 
 | Capability | Owner | Contributor | Cheerleader | Viewer |
 |---|---|---|---|---|
-| View trip | yes | yes | yes | yes |
+| View trip (route, progress, energy, rider comments) | yes | yes | yes | yes |
+| View supplies, lodging, costs & budget | yes | yes | **no** | **no** |
 | Edit trip details | yes | no | no | no |
 | Add/edit destinations, supplies, lodging, costs | yes | yes | no | no |
 | Log own check-in + energy | yes | yes | no | no |
@@ -30,13 +31,17 @@ Roles are per-trip membership rows, not global user attributes.
 | Delete trip | yes | no | no | no |
 | Receive update notifications | opt-in | opt-in | yes (default) | no |
 
+Every member, cheerleaders included, must have an account and an `active`
+membership row before any trip data is returned.
+
 Owner is a single account; ownership transfer is out of scope for v1.
 
 ## 4. Domain model
 
 - **profile** — id (= auth user), display_name, avatar_url, created_at.
 - **trip** — id, owner_id, name, description, start_date, end_date, status
-  (planning | active | completed), currency, created_at.
+  (planning | active | completed), currency, distance_unit (km | mi, display
+  default), created_at.
 - **trip_member** — id, trip_id, user_id (nullable until invite accepted),
   invite_email, role (owner | contributor | cheerleader | viewer), status
   (invited | active | removed).
@@ -71,32 +76,47 @@ optional coordinates and notes. Marking a destination reached happens via a
 check-in.
 
 **Supplies** — line items with quantity and unit cost, grouped by category,
-packed checkbox. Auto-computed subtotal.
+packed checkbox. Auto-computed subtotal. Owner/contributor only.
 
 **Lodging** — stays attached to a destination or standalone, with dates, cost
-and booking reference.
+and booking reference. Owner/contributor only.
 
 **Budget** — a single trip cost summary: supplies subtotal + lodging subtotal +
 total, with per-category breakdown. No per-person splitting in v1.
+Owner/contributor only — hidden and unreadable for cheerleaders/viewers.
 
 **Energy check-ins** — at a destination a rider logs arrival time, energy 1–10,
-optional note and distance. Trip page shows an energy line chart over the trip
-timeline, per rider, plus averages.
+optional comment and distance. The trip page shows a combined chart with one
+line per rider over the trip timeline.
 
-**Cheerleaders** — owner invites by email; invitee gets an email link, signs in
-or signs up, and joins the trip as cheerleader. They see a read-only trip page
-and follow the activity feed.
+**Rider feed** — each rider has their own feed on the trip: average energy
+across all their check-ins, their energy at every logged point (chart + list of
+destination, time, energy), and their comments in chronological order.
+Cheerleaders can open any rider's feed.
+
+**Distance & units** — distances stored in kilometres; each trip has a
+`distance_unit` default set by the owner. On the trip summary page any viewer
+can toggle km/mi, converting total planned distance, distance from/between
+destinations, and total distance travelled. The choice is remembered per viewer
+and never changes stored data.
+
+**Cheerleaders** — owner invites by email; the invite link requires the invitee
+to sign up or sign in before any trip data loads. Once accepted they get a
+read-only trip page: route, progress, energy, rider feeds and the activity feed
+— no costs.
 
 **Activity feed + email** — every meaningful action writes an
 `activity_event` (check-in logged, destination reached, trip started/completed,
-member joined). The trip page renders the feed. Cheerleaders receive email:
-instant for check-ins and trip status changes, or a daily digest, per their
-preference. Unsubscribe link per trip.
+member joined). The trip page renders the feed; cost-related events are
+filtered out for cheerleaders/viewers. Cheerleaders receive email: instant for
+check-ins and trip status changes, or a daily digest, per their preference.
+Unsubscribe link per trip.
 
 ## 6. Out of scope for v1
 
 Live GPS tracking, mobile app, SMS/push, per-person expense splitting, route
-mapping/turn-by-turn, offline mode, photo uploads, public shareable pages.
+mapping/turn-by-turn, offline mode, photo uploads, public shareable pages,
+anonymous/preview access for invited cheerleaders.
 
 ## 7. Design principles
 
@@ -121,11 +141,24 @@ mapping/turn-by-turn, offline mode, photo uploads, public shareable pages.
 6. Members, invites, roles
 7. Activity feed + email notifications
 
-## 9. Open questions
+## 9. Resolved decisions
 
-- Should cheerleaders see costs and budget, or only route/progress/energy?
-- Does a trip have one shared energy line, or one per rider (spec assumes per
-  rider)?
-- Distance: kilometres, miles, or a per-trip unit preference?
-- Should an invited cheerleader without an account see a limited public link
-  before signing up?
+- **Cheerleader visibility** — cheerleaders never see costs, budget, supplies or
+  lodging. They see the route (destinations + order), progress, energy data and
+  rider comments (`mood_note` on check-ins) only. Enforced by RLS: the supply,
+  lodging and cost columns are unreadable for members whose role is
+  `cheerleader` or `viewer`, not just hidden in the UI.
+- **Energy is per rider** — every rider gets their own feed on the trip page
+  showing: their average energy across all their check-ins, their energy at each
+  logged point (chart + list), and their comments in chronological order. The
+  trip page also shows a combined chart overlaying one line per rider.
+- **Distance units are a per-trip preference** — `trip.distance_unit`
+  (`km | mi`), set by the owner, is the storage-independent display default.
+  Distances are always stored in kilometres and converted on display. On the
+  trip summary page a viewer can switch units themselves (per-viewer override,
+  remembered locally), which converts: total planned trip distance, distance
+  between/from each destination, and total distance travelled so far.
+- **No anonymous access** — a cheerleader must create an account and accept the
+  invite before seeing any trip data. Invite links land on sign-up/sign-in; no
+  public or preview page exists in v1.
+
