@@ -38,7 +38,7 @@ export function EnergyChart({ rows }: { rows: CheckInWithNames[] }) {
       acc[key] = { ...(acc[key] ?? {}), ...p };
       return acc;
     }, {}),
-  ).sort((a, b) => Number(a.time) - Number(b.time));
+  ).sort((a, b) => Number(a['time']) - Number(b['time']));
 
   if (!rows.length) {
     return (

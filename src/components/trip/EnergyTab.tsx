@@ -175,7 +175,7 @@ export function EnergyTab({
                   max={10}
                   step={1}
                   value={[energy]}
-                  onValueChange={(v) => setEnergy(v[0])}
+                  onValueChange={(v) => setEnergy(v[0] ?? 5)}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
