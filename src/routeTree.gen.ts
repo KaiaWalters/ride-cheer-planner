@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TripsIndexRouteImport } from './routes/trips.index'
+import { Route as TripsTripIdRouteImport } from './routes/trips.$tripId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,34 +29,43 @@ const TripsIndexRoute = TripsIndexRouteImport.update({
   path: '/trips/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TripsTripIdRoute = TripsTripIdRouteImport.update({
+  id: '/trips/$tripId',
+  path: '/trips/$tripId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/trips/$tripId': typeof TripsTripIdRoute
   '/trips/': typeof TripsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/trips/$tripId': typeof TripsTripIdRoute
   '/trips': typeof TripsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/trips/$tripId': typeof TripsTripIdRoute
   '/trips/': typeof TripsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/trips/'
+  fullPaths: '/' | '/auth' | '/trips/$tripId' | '/trips/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/trips'
-  id: '__root__' | '/' | '/auth' | '/trips/'
+  to: '/' | '/auth' | '/trips/$tripId' | '/trips'
+  id: '__root__' | '/' | '/auth' | '/trips/$tripId' | '/trips/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  TripsTripIdRoute: typeof TripsTripIdRoute
   TripsIndexRoute: typeof TripsIndexRoute
 }
 
@@ -82,12 +92,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/trips/$tripId': {
+      id: '/trips/$tripId'
+      path: '/trips/$tripId'
+      fullPath: '/trips/$tripId'
+      preLoaderRoute: typeof TripsTripIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  TripsTripIdRoute: TripsTripIdRoute,
   TripsIndexRoute: TripsIndexRoute,
 }
 export const routeTree = rootRouteImport
